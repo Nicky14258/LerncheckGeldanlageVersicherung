@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Lerncheck Geldanlage &amp; Versicherung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column, a quiz "Schalter" (counter) card; brass marks the score, petrol the action */
+:root{
+  --bg:#EEF2F3; --surface:#FFFFFF; --ink:#14212B; --muted:#56656F; --line:#D3DCDF;
+  --accent:#0B6466; --accent-ink:#FFFFFF; --accent-soft:#DCEDEC;
+  --brass:#9A6B12; --brass-soft:#F4EAD4;
+  --ok:#17804A; --ok-soft:#E0F2E7; --bad:#B63A26; --bad-soft:#F8E3DE;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F171C; --surface:#172229; --ink:#E4ECEF; --muted:#98A8B1; --line:#2A3A43;
+  --accent:#4DBDB5; --accent-ink:#06201F; --accent-soft:#163A3A;
+  --brass:#E0B25A; --brass-soft:#3A2F17;
+  --ok:#5CCB8B; --ok-soft:#163323; --bad:#F07A63; --bad-soft:#3D1F19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F171C; --surface:#172229; --ink:#E4ECEF; --muted:#98A8B1; --line:#2A3A43;
+  --accent:#4DBDB5; --accent-ink:#06201F; --accent-soft:#163A3A;
+  --brass:#E0B25A; --brass-soft:#3A2F17;
+  --ok:#5CCB8B; --ok-soft:#163323; --bad:#F07A63; --bad-soft:#3D1F19; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding-block:32px 64px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:flex;flex-direction:column;gap:24px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,6vw,46px);line-height:1.05;margin:6px 0 10px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0;text-wrap:balance}
+p{margin:0}
+.lead{color:var(--muted);max-width:62ch}
+.rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.round{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.round:hover{border-color:var(--accent)}
+.round .n{font-family:var(--f-mono);font-size:12px;color:var(--brass);letter-spacing:.06em}
+.round strong{font-family:var(--f-display);font-size:18px;line-height:1.2}
+.round span.d{font-size:14px;color:var(--muted)}
+.round span.go{margin-top:auto;font-size:14px;font-weight:700;color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{font:inherit;font-weight:700;border-radius:8px;padding:12px 20px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.note{font-size:14px;color:var(--muted)}
+
+/* quiz */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.score{font-family:var(--f-mono);font-size:14px;background:var(--brass-soft);color:var(--brass);padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.case{border-left:4px solid var(--brass);background:var(--brass-soft);padding:12px 14px;border-radius:0 8px 8px 0}
+.case b{display:block;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);margin-bottom:2px}
+.q{font-size:20px;font-weight:600;line-height:1.4;text-wrap:pretty}
+.opts{display:grid;gap:10px}
+.opts.grid2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.opt{font:inherit;text-align:left;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{font-family:var(--f-mono);font-size:13px;color:var(--muted);min-width:1.2em;padding-top:2px}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.dim{opacity:.55}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tf .opt{justify-content:center;font-weight:700}
+.fb{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.fb.ok{background:var(--ok-soft)} .fb.no{background:var(--bad-soft)}
+.fb .verdict{font-weight:700}
+.fb.ok .verdict{color:var(--ok)} .fb.no .verdict{color:var(--bad)}
+
+/* result */
+.big{font-family:var(--f-display);font-weight:800;font-size:64px;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:24px;color:var(--muted);font-weight:600}
+.rtable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.rtable td{padding:10px 0;border-bottom:1px solid var(--line)}
+.rtable td:last-child{text-align:right;font-family:var(--f-mono)}
+.miss{display:flex;flex-direction:column;gap:12px}
+.miss li{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;list-style:none;display:flex;flex-direction:column;gap:4px}
+.miss ul{padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.miss .a{font-size:15px;color:var(--ok);font-weight:600}
+.miss .e{font-size:15px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+@media (max-width:480px){.card{padding:18px}.q{font-size:18px}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const ROUNDS = [
+ {id:"r1", name:"Kapitalmarkt & Geldanlage", desc:"Akteure, Sparmotive, magisches Dreieck, Anlageformen", type:"mc"},
+ {id:"r2", name:"Welche Versicherung zahlt?", desc:"Neun Schadensfälle aus dem Alltag zuordnen", type:"case"},
+ {id:"r3", name:"Richtig oder falsch?", desc:"Riester, Rürup, Bausparen und Versicherungsdetails", type:"tf"}
+];
+
+const Q = {
+ r1:[
+  {q:"Eine Bank sammelt viele kleine Spareinlagen und vergibt daraus einen großen Kredit an ein Unternehmen. Welche Funktion erfüllt sie damit?",
+   o:["Losgrößentransformation","Fristentransformation","Risikotransformation","Geldschöpfung für die EZB"],a:0,
+   e:"Viele kleine Beträge werden zu einem großen Kreditbetrag gebündelt. Fristentransformation betrifft dagegen die Laufzeiten, Risikotransformation die Verteilung des Ausfallrisikos."},
+  {q:"Welche Aufgabe erfüllt die Börse NICHT?",
+   o:["Unternehmen können über die Ausgabe von Aktien Eigenkapital beschaffen","Kurse bilden sich aus Angebot und Nachfrage","Wertpapiere lassen sich jederzeit kaufen und verkaufen","Sie garantiert Anlegern einen Mindestkurs für ihre Aktien"],a:3,
+   e:"Die Börse organisiert den Handel und die Preisbildung. Einen Mindestkurs garantiert niemand – Kurse können bis auf null fallen."},
+  {q:"Ein Start-up sammelt über eine Crowdinvesting-Plattform 300.000 € von vielen Kleinanlegern ein. Welches Risiko ist typisch?",
+   o:["Totalverlust möglich, da oft Nachrangdarlehen ohne Einlagensicherung","Das Geld ist bis 100.000 € durch die Einlagensicherung geschützt","Der Staat garantiert eine feste Mindestverzinsung","Das Geld ist täglich verfügbar wie auf einem Tagesgeldkonto"],a:0,
+   e:"Crowdinvesting finanziert junge Unternehmen und ist entsprechend riskant. Nachrangige Darlehen werden bei einer Insolvenz erst nach allen anderen Gläubigern bedient – oft bleibt nichts übrig."},
+  {q:"Lena (17) legt jeden Monat 50 € zurück, um im nächsten Jahr ihren Führerschein zu bezahlen. Welches Sparmotiv liegt vor?",
+   o:["Altersvorsorge","Zwecksparen","Vermögensbildung","Vorsichtssparen (Notgroschen)"],a:1,
+   e:"Sie spart für eine konkrete, absehbare Ausgabe. Liquidität ist hier wichtiger als Rendite – eine Aktie wäre für diesen kurzen Zeitraum ungeeignet."},
+  {q:"Warum spricht man vom „magischen“ Dreieck der Geldanlage?",
+   o:["Weil Rentabilität, Liquidität und Sicherheit nicht gleichzeitig maximal erreichbar sind","Weil eine gute Anlage alle drei Ziele automatisch erfüllt","Weil der Staat die drei Ziele gesetzlich garantiert","Weil nur Banken alle drei Ziele kennen"],a:0,
+   e:"Zwischen den Zielen bestehen Zielkonflikte: Mehr Rendite bedeutet meist mehr Risiko oder eine längere Bindung des Geldes. Ergänzt man ethische Aspekte, spricht man vom magischen Viereck."},
+  {q:"Welche Anlageform bietet hohe Liquidität und hohe Sicherheit, aber eine eher geringe Rentabilität?",
+   o:["Einzelaktie eines Tech-Start-ups","Festgeld mit 5 Jahren Laufzeit","Tagesgeldkonto","Eigentumswohnung"],a:2,
+   e:"Tagesgeld ist täglich verfügbar und über die Einlagensicherung geschützt, die Zinsen sind variabel und meist niedrig. Festgeld ist sicher, aber während der Laufzeit nicht verfügbar."},
+  {q:"Wer eine Unternehmensanleihe kauft, …",
+   o:["wird Miteigentümer und erhält ein Stimmrecht auf der Hauptversammlung","wird Gläubiger, erhält Zinsen und am Laufzeitende das Geld zurück","erhält eine gewinnabhängige Dividende","ist durch die gesetzliche Einlagensicherung geschützt"],a:1,
+   e:"Eine Anleihe ist Fremdkapital: Der Anleger leiht dem Unternehmen Geld. Eigentümer mit Stimmrecht und Dividende sind die Aktionäre. Fällt das Unternehmen aus, droht auch bei Anleihen ein Verlust."},
+  {q:"Warum gilt ein ETF auf einen breiten Weltaktienindex als weniger riskant als eine einzelne Aktie?",
+   o:["Der Staat garantiert den Wert von ETFs","Das Geld ist auf viele Unternehmen verteilt (Diversifikation)","ETF-Kurse können nicht fallen","ETFs unterliegen der Einlagensicherung"],a:1,
+   e:"Geht ein einzelnes Unternehmen pleite, fällt das bei über tausend Titeln kaum ins Gewicht. Gegen Kursrückgänge des gesamten Marktes schützt aber auch ein ETF nicht."},
+  {q:"Festgeld bringt 2 % Zinsen, die Inflationsrate liegt bei 2,5 %. Was bedeutet das?",
+   o:["Der Realzins beträgt etwa +4,5 %","Der Realzins beträgt etwa −0,5 %, die Kaufkraft sinkt","Der Realzins beträgt genau 2 %","Inflation spielt bei Festgeld keine Rolle"],a:1,
+   e:"Realzins ≈ Nominalzins − Inflationsrate. Der Kontostand steigt, man kann sich davon aber weniger kaufen als vorher."}
+ ],
+ r2:[
+  {c:"Beim Fußballspielen im Park schießt Jonas den Ball versehentlich in das Fenster eines Nachbarhauses.",a:0,
+   e:"Wer einem anderen fahrlässig einen Schaden zufügt, haftet nach § 823 BGB mit seinem ganzen Vermögen. Die Privathaftpflicht übernimmt berechtigte Ansprüche und wehrt unberechtigte ab."},
+  {c:"Während Lena im Urlaub ist, brechen Unbekannte in ihre Wohnung ein und stehlen Laptop und Fernseher.",a:1,
+   e:"Die Hausratversicherung ersetzt bewegliche Sachen in der Wohnung bei Einbruchdiebstahl, Feuer, Leitungswasser, Sturm und Hagel – in der Regel zum Neuwert."},
+  {c:"Max stürzt in den Ferien beim Mountainbiken und behält eine dauerhafte Bewegungseinschränkung im Knie.",a:2,
+   e:"Die gesetzliche Unfallversicherung gilt nur in Schule, Ausbildung, Beruf und auf den Wegen dorthin. Für Freizeitunfälle zahlt nur die private Unfallversicherung, meist als Kapitalbetrag je nach Invaliditätsgrad."},
+  {c:"Eine Krankenpflegerin kann wegen eines schweren Bandscheibenvorfalls dauerhaft nicht mehr in ihrem Beruf arbeiten.",a:3,
+   e:"Die Ursache ist eine Krankheit, kein Unfall – die Unfallversicherung zahlt daher nicht. Die BU-Versicherung zahlt eine monatliche Rente, meist wenn man den Beruf zu mindestens 50 % nicht mehr ausüben kann."},
+  {c:"Sarahs Vermieter behält die Kaution ohne Grund ein. Sarah will klagen, fürchtet aber die Anwalts- und Gerichtskosten.",a:4,
+   e:"Die Rechtsschutzversicherung übernimmt Anwalts-, Gerichts- und Gutachterkosten – aber nur für versicherte Bereiche (hier Mietrecht) und meist erst nach einer Wartezeit von etwa drei Monaten."},
+  {c:"Ein Vater möchte sicherstellen, dass seine Familie den Immobilienkredit weiter abbezahlen kann, falls er stirbt.",a:5,
+   e:"Die Risikolebensversicherung zahlt im Todesfall eine vereinbarte Summe an die Hinterbliebenen. Sie enthält keinen Sparanteil und ist deshalb vergleichsweise günstig."},
+  {c:"Tim lässt sein eigenes Smartphone fallen, das Display ist gesprungen.",a:6,
+   e:"Die Haftpflicht zahlt nur Schäden bei anderen, nie am eigenen Eigentum. Die Hausrat deckt keinen einfachen Bruch. Hier hilft nur eine (oft teure) Geräteversicherung – oder das eigene Ersparte."},
+  {c:"Ein Sturm deckt das Dach des eigenen Einfamilienhauses ab.",a:6,
+   e:"Schäden am Gebäude selbst übernimmt die Wohngebäudeversicherung. Die Hausrat zahlt nur für die Einrichtung, z. B. wenn durch das offene Dach Möbel nass werden."},
+  {c:"Paul vergisst, das Badewasser abzudrehen. Das Wasser läuft durch die Decke in die Wohnung der Nachbarin und beschädigt dort Möbel.",a:0,
+   e:"Geschädigt ist eine andere Person, also greift die Privathaftpflicht. Schäden an Pauls eigenen Möbeln wären dagegen ein Fall für seine Hausratversicherung."}
+ ],
+ r3:[
+  {s:"Die Riester-Rente wird mit staatlichen Zulagen gefördert, zum Beispiel einer Grundzulage und Kinderzulagen.",a:true,
+   e:"Grundzulage 175 € pro Jahr, Kinderzulage bis 300 € je Kind (für ab 2008 geborene Kinder), dazu ein möglicher Steuervorteil über den Sonderausgabenabzug."},
+  {s:"Ab 2027 können keine neuen Riester-Verträge mehr abgeschlossen werden; bestehende Verträge laufen weiter.",a:true,
+   e:"Das Altersvorsorgereformgesetz von 2026 ersetzt Riester ab 2027 durch das geförderte Altersvorsorgedepot (Anlage z. B. in ETFs, ohne verpflichtende Beitragsgarantie). Alte Verträge haben Bestandsschutz und können freiwillig wechseln."},
+  {s:"Die Rürup-Rente (Basisrente) kann man sich zu Rentenbeginn als einmalige Kapitalsumme auszahlen lassen.",a:false,
+   e:"Die Rürup-Rente zahlt ausschließlich eine lebenslange monatliche Rente. Sie ist nicht kapitalisierbar, nicht vererbbar, nicht beleihbar und nicht übertragbar."},
+  {s:"Die Rürup-Rente ist vor allem für gut verdienende Selbstständige interessant, weil die Beiträge steuerlich als Sonderausgaben absetzbar sind.",a:true,
+   e:"Selbstständige waren bisher meist nicht riester-berechtigt. Bei Rürup profitieren sie vor allem vom Steuervorteil – je höher der Steuersatz, desto größer der Effekt."},
+  {s:"Beim Bausparvertrag spart man zuerst einen Teil der Bausparsumme an und erhält danach ein Darlehen zu einem bei Vertragsabschluss festgelegten Zins.",a:true,
+   e:"Ansparphase → Zuteilung → Darlehensphase. Der Vorteil ist die Zinssicherheit für die spätere Baufinanzierung; staatliche Förderung gibt es z. B. über die Wohnungsbauprämie."},
+  {s:"Das Bauspardarlehen darf für jeden beliebigen Zweck verwendet werden, zum Beispiel für ein neues Auto.",a:false,
+   e:"Das Darlehen ist zweckgebunden: Kauf, Bau, Modernisierung oder Entschuldung von Wohneigentum."},
+  {s:"Die Privathaftpflicht ersetzt auch Schäden an den eigenen Sachen.",a:false,
+   e:"Haftpflicht heißt: Ich hafte gegenüber anderen. Eigene Schäden sind nie versichert."},
+  {s:"Die gesetzliche Unfallversicherung schützt Schülerinnen und Schüler auch in ihrer Freizeit.",a:false,
+   e:"Sie gilt nur während des Unterrichts, bei Schulveranstaltungen und auf dem direkten Schulweg. Rund zwei Drittel aller Unfälle passieren aber in der Freizeit."},
+  {s:"Ein Fahrrad, das vor dem Supermarkt gestohlen wird, ist über die Hausratversicherung immer automatisch mitversichert.",a:false,
+   e:"Außerhalb der Wohnung bzw. des verschlossenen Kellers braucht man meist eine zusätzliche Fahrradklausel."},
+  {s:"Eine Kapitallebensversicherung verbindet Todesfallschutz mit Sparen, bringt aber wegen hoher Kosten oft nur geringe Renditen.",a:true,
+   e:"Verbraucherschützer raten meist, Absicherung (Risikolebensversicherung) und Geldanlage (z. B. ETF-Sparplan) zu trennen."},
+  {s:"Eine Rechtsschutzversicherung zahlt ab dem ersten Tag für jeden Rechtsstreit.",a:false,
+   e:"Meist gilt eine Wartezeit von rund drei Monaten. Außerdem sind bestimmte Bereiche ausgeschlossen, etwa Scheidungen oder Streitigkeiten, die schon vor Vertragsabschluss begonnen haben."}
+ ]
+};
+const CASE_OPTS = ["Privathaftpflicht","Hausratversicherung","Private Unfallversicherung","Berufsunfähigkeitsversicherung","Rechtsschutzversicherung","Risikolebensversicherung","Keine dieser Versicherungen"];
+
+const app = document.getElementById("app");
+let S = null;
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function build(roundIds, onlyItems){
+  let items=[];
+  roundIds.forEach(rid=>{
+    const r=ROUNDS.find(x=>x.id===rid);
+    shuffle(Q[rid]).forEach(it=>{
+      if(onlyItems && !onlyItems.includes(it)) return;
+      let opts, correct;
+      if(r.type==="mc"){ const idx=shuffle(it.o.map((_,i)=>i)); opts=idx.map(i=>it.o[i]); correct=idx.indexOf(it.a); }
+      else if(r.type==="case"){ opts=CASE_OPTS; correct=it.a; }
+      else { opts=["Richtig","Falsch"]; correct=it.a?0:1; }
+      items.push({round:r,src:it,opts,correct,picked:null});
+    });
+  });
+  return items;
+}
+
+function start(roundIds, onlyItems){
+  S={items:build(roundIds,onlyItems),i:0};
+  renderQ();
+}
+
+function renderStart(){
+  app.innerHTML=`
+  <header>
+    <div class="eyebrow">Wirtschaft und Recht · 11 WWG · Abschluss Lernbereich 4</div>
+    <h1>Lerncheck Geldanlage &amp; Versicherung</h1>
+    <p class="lead">Drei Runden mit insgesamt ${Q.r1.length+Q.r2.length+Q.r3.length} Aufgaben. Nach jeder Antwort siehst du sofort, ob sie stimmt und warum. Am Ende bekommst du eine Auswertung und kannst deine Fehler gezielt wiederholen.</p>
+  </header>
+  <div class="rounds">
+    ${ROUNDS.map((r,i)=>`<button class="round" data-r="${r.id}">
+      <span class="n">RUNDE ${i+1} · ${Q[r.id].length} AUFGABEN</span>
+      <strong>${r.name}</strong><span class="d">${r.desc}</span>
+      <span class="go">Nur diese Runde →</span></button>`).join("")}
+  </div>
+  <div class="row"><button class="btn" id="all">Gesamten Lerncheck starten</button>
+  <span class="note">Dauer etwa 20–25 Minuten · Tastatur: 1–7 zum Antworten, Enter für Weiter</span></div>`;
+  app.querySelector("#all").onclick=()=>start(ROUNDS.map(r=>r.id));
+  app.querySelectorAll(".round").forEach(b=>b.onclick=()=>start([b.dataset.r]));
+}
+
+function renderQ(){
+  const it=S.items[S.i], r=it.round, n=S.items.length;
+  const pts=S.items.filter(x=>x.picked!==null && x.picked===x.correct).length;
+  const done=it.picked!==null;
+  let body="";
+  if(r.type==="mc") body=`<p class="q">${esc(it.src.q)}</p>`;
+  if(r.type==="case") body=`<div class="case"><b>Schadensfall</b>${esc(it.src.c)}</div><p class="q">Welche Versicherung zahlt?</p>`;
+  if(r.type==="tf") body=`<p class="q">${esc(it.src.s)}</p>`;
+  const cls=r.type==="tf"?"tf":(r.type==="case"?"opts grid2":"opts");
+  const opts=it.opts.map((o,k)=>{
+    let c="opt";
+    if(done){ if(k===it.correct) c+=" right"; else if(k===it.picked) c+=" wrong"; else c+=" dim"; }
+    return `<button class="${c}" data-k="${k}" ${done?"disabled":""}>${r.type==="tf"?"":`<span class="k">${k+1}</span>`}<span>${esc(o)}</span></button>`;
+  }).join("");
+  let fb="";
+  if(done){
+    const ok=it.picked===it.correct;
+    fb=`<div class="fb ${ok?"ok":"no"}" role="status"><span class="verdict">${ok?"Richtig.":"Leider nicht. Richtig ist: "+esc(it.opts[it.correct])}</span><span>${esc(it.src.e)}</span></div>
+    <div class="row"><button class="btn" id="next">${S.i<n-1?"Weiter":"Zur Auswertung"}</button></div>`;
+  }
+  app.innerHTML=`
+  <div class="top"><span class="eyebrow">${esc(r.name)} · Aufgabe ${S.i+1} von ${n}</span><span class="score">${pts} Punkte</span></div>
+  <div class="bar"><i style="width:${(S.i+(done?1:0))/n*100}%"></i></div>
+  <section class="card">${body}<div class="${cls}">${opts}</div>${fb}</section>
+  <div class="row"><button class="btn ghost" id="quit">Abbrechen</button></div>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{it.picked=+b.dataset.k;renderQ();const nx=document.getElementById("next");nx&&nx.focus()});
+  const nx=document.getElementById("next");
+  if(nx) nx.onclick=next;
+  document.getElementById("quit").onclick=renderStart;
+}
+function next(){ if(S.i<S.items.length-1){S.i++;renderQ();window.scrollTo({top:0})} else renderResult(); }
+
+function renderResult(){
+  const items=S.items, pts=items.filter(x=>x.picked===x.correct).length, n=items.length;
+  const pct=Math.round(pts/n*100);
+  const msg=pct>=90?"Hervorragend – du beherrschst das Kapitel sicher.":pct>=70?"Gut gemacht. Schau dir die wenigen Fehler unten noch einmal an.":pct>=50?"Solide Grundlage, aber einige Lücken. Wiederhole die falschen Aufgaben.":"Hier lohnt sich eine gründliche Wiederholung des Kapitels.";
+  const per=ROUNDS.filter(r=>items.some(x=>x.round===r)).map(r=>{
+    const xs=items.filter(x=>x.round===r);return `<tr><td>${r.name}</td><td>${xs.filter(x=>x.picked===x.correct).length} / ${xs.length}</td></tr>`}).join("");
+  const wrong=items.filter(x=>x.picked!==x.correct);
+  const wl=wrong.map(x=>{const t=x.src.q||x.src.c||x.src.s;return `<li><span>${esc(t)}</span><span class="a">Richtig: ${esc(x.opts[x.correct])}</span><span class="e">${esc(x.src.e)}</span></li>`}).join("");
+  app.innerHTML=`
+  <header><div class="eyebrow">Auswertung</div><h1>Dein Ergebnis</h1></header>
+  <section class="card">
+    <div class="big">${pts}<small> / ${n} Punkte · ${pct} %</small></div>
+    <p>${msg}</p>
+    <table class="rtable"><tbody>${per}</tbody></table>
+  </section>
+  <div class="row">
+    ${wrong.length?`<button class="btn" id="retry">${wrong.length} falsche Aufgabe${wrong.length>1?"n":""} wiederholen</button>`:""}
+    <button class="btn ghost" id="home">Zur Startseite</button>
+  </div>
+  ${wrong.length?`<section class="miss"><h2>Das solltest du dir noch einmal ansehen</h2><ul>${wl}</ul></section>`:""}`;
+  const rt=document.getElementById("retry");
+  if(rt) rt.onclick=()=>{const src=wrong.map(x=>x.src);const ids=[...new Set(wrong.map(x=>x.round.id))];start(ids,src)};
+  document.getElementById("home").onclick=renderStart;
+  window.scrollTo({top:0});
+}
+
+document.addEventListener("keydown",e=>{
+  if(!S||!document.querySelector(".card .opt")) return;
+  const it=S.items[S.i];
+  if(it.picked===null){
+    const k=parseInt(e.key,10)-1;
+    if(k>=0&&k<it.opts.length){it.picked=k;renderQ();}
+    else if(it.round.type==="tf"&&(e.key==="r"||e.key==="f")){it.picked=e.key==="r"?0:1;renderQ();}
+  } else if(e.key==="Enter"&&document.activeElement.id!=="next"){next();}
+});
+
+renderStart();
+</script>
+
+</body>
+</html>
